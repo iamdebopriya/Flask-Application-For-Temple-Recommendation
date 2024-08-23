@@ -31,23 +31,26 @@ def parse_coordinates(coord_str):
     return [np.nan, np.nan]
 
 # Define recommendation function
-def get_recommendations(query=None):
+def get_recommendations(description=None, name=None):
     recommendations = pd.DataFrame()
 
-    if query:
-        # Filter based on description similarity
-        desc_sim = cosine_similarity(tfidf.transform([query]), tfidf_matrix)
-        desc_scores = list(enumerate(desc_sim[0]))
-        desc_scores = [score for score in desc_scores if score[1] > 0.0]  # Filter scores > 0.0
-        desc_scores = sorted(desc_scores, key=lambda x: x[1], reverse=True)
-        desc_indices = [i[0] for i in desc_scores]
-        recommendations = df.iloc[desc_indices][['templeName', 'Coordinates', 'Description']]
+    if description or name:
+        desc_sim = cosine_similarity(tfidf.transform([description if description else ""]), tfidf_matrix)
+        name_sim = cosine_similarity(tfidf.transform([name if name else ""]), tfidf_matrix)
+        
+        # Combine similarity scores
+        combined_scores = (desc_sim[0] + name_sim[0]) / 2
 
-        # Additionally, filter by temple name if provided
-        similar_names = df[df['templeName'].str.contains(query, case=False, na=False)]
-        recommendations = pd.concat([recommendations, similar_names])
+        # Filter out recommendations with similarity <= 0.0
+        high_sim_indices = np.where(combined_scores > 0.0)[0]
 
-    # Remove duplicate recommendations based on templeName
+        if len(high_sim_indices) > 0:
+            high_sim_scores = combined_scores[high_sim_indices]
+            desc_scores = sorted(list(zip(high_sim_indices, high_sim_scores)), key=lambda x: x[1], reverse=True)
+            desc_scores = desc_scores[:10]  # Top 10 recommendations
+            desc_indices = [i[0] for i in desc_scores]
+            recommendations = df.iloc[desc_indices][['templeName', 'Coordinates', 'Description']]
+
     recommendations = recommendations.drop_duplicates(subset='templeName')
     return recommendations
 
@@ -57,8 +60,8 @@ def index():
 
 @app.route('/recommend', methods=['POST'])
 def recommend():
-    query = request.form.get('query')
-    recommendations = get_recommendations(query=query)
+    description = request.form.get('description')
+    recommendations = get_recommendations(description=description)
     return render_template('recommend.html', recommendations=recommendations)
 
 @app.route('/show_map')
