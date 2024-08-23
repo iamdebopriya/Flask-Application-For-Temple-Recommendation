@@ -1,3 +1,6 @@
 Flask
 pandas
+numpy
 scikit-learn
+folium
+gunicorn
