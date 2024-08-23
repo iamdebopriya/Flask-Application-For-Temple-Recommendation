@@ -31,17 +31,23 @@ def parse_coordinates(coord_str):
     return [np.nan, np.nan]
 
 # Define recommendation function
-def get_recommendations(description=None):
+def get_recommendations(query=None):
     recommendations = pd.DataFrame()
 
-    if description:
-        desc_sim = cosine_similarity(tfidf.transform([description]), tfidf_matrix)
+    if query:
+        # Filter based on description similarity
+        desc_sim = cosine_similarity(tfidf.transform([query]), tfidf_matrix)
         desc_scores = list(enumerate(desc_sim[0]))
+        desc_scores = [score for score in desc_scores if score[1] > 0.0]  # Filter scores > 0.0
         desc_scores = sorted(desc_scores, key=lambda x: x[1], reverse=True)
-        desc_scores = desc_scores[:10]
         desc_indices = [i[0] for i in desc_scores]
         recommendations = df.iloc[desc_indices][['templeName', 'Coordinates', 'Description']]
-    
+
+        # Additionally, filter by temple name if provided
+        similar_names = df[df['templeName'].str.contains(query, case=False, na=False)]
+        recommendations = pd.concat([recommendations, similar_names])
+
+    # Remove duplicate recommendations based on templeName
     recommendations = recommendations.drop_duplicates(subset='templeName')
     return recommendations
 
@@ -51,8 +57,8 @@ def index():
 
 @app.route('/recommend', methods=['POST'])
 def recommend():
-    description = request.form.get('description')
-    recommendations = get_recommendations(description)
+    query = request.form.get('query')
+    recommendations = get_recommendations(query=query)
     return render_template('recommend.html', recommendations=recommendations)
 
 @app.route('/show_map')
