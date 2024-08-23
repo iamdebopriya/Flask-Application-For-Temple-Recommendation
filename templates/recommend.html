@@ -5,18 +5,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recommendations</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+        h1 {
+            text-align: center;
+            color: #007bff;
+            margin-top: 20px;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .recommendation {
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #333;
+        }
+        p {
+            color: #666;
+        }
+        a {
+            text-decoration: none;
+            color: #007bff;
+            font-size: 16px;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-    <h1>Recommended Temples</h1>
-    {% for temple in recommendations.itertuples() %}
-        <div>
-            <h2>{{ temple.templeName }}</h2>
-            <p>{{ temple.Description }}</p>
-            <p>Coordinates: {{ temple.Coordinates }}</p>
-        </div>
-        <hr>
-    {% endfor %}
-    <br>
-    <a href="/">Go Back</a>
+    <div class="container">
+        <h1>Recommended Temples</h1>
+        {% if recommendations.empty %}
+            <p>No recommendations found with similarity greater than 0.0.</p>
+        {% else %}
+            {% for temple in recommendations.itertuples() %}
+                <div class="recommendation">
+                    <h2>{{ temple.templeName }}</h2>
+                    <p>{{ temple.Description }}</p>
+                    <p>Coordinates: {{ temple.Coordinates }}</p>
+                </div>
+                <hr>
+            {% endfor %}
+        {% endif %}
+        <br>
+        <a href="/">Go Back</a>
+    </div>
 </body>
 </html>
