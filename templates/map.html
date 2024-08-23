@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temple Map</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1>Temple Locations</h1>
+    <div id="map-container" style="width: 700px; height: 500px;">
+        {{ map_html | safe }}
+    </div>
+    <br>
+    <a href="/">Go Back</a>
+</body>
+</html>

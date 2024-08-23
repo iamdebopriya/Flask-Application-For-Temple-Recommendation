@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recommendations</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1>Recommended Temples</h1>
+    {% for temple in recommendations.itertuples() %}
+        <div>
+            <h2>{{ temple.templeName }}</h2>
+            <p>{{ temple.Description }}</p>
+            <p>Coordinates: {{ temple.Coordinates }}</p>
+        </div>
+        <hr>
+    {% endfor %}
+    <br>
+    <a href="/">Go Back</a>
+</body>
+</html>

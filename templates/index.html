@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temple Recommendation System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1>Temple Recommendation System</h1>
+    <form action="/recommend" method="POST">
+        <textarea name="description" placeholder="Enter Temple Description"></textarea>
+        <button type="submit">Recommend</button>
+    </form>
+    <br>
+    <a href="/show_map">Show All Locations</a>
+</body>
+</html>
